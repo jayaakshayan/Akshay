@@ -1,6 +1,0 @@
-- name: 3tier
-  hosts: localhost
-  connection: local
-git clone https://github.com/sidja/ansible-vagrant-3-tier-architecture.git
-cd ansible-vagrant-3-tier-architecture
-vagrant up

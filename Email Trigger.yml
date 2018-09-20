@@ -1,0 +1,9 @@
+- mail:
+    host: smtp.gmail.com
+    port: 587
+    username: jayaakshayan79@gmail.com
+    password: p@$$word1987
+    to: John Smith <john.smith@example.com>
+    subject: Ansible-report
+    body: 'System {{ ansible_hostname }} has been successfully provisioned.'
+  delegate_to: localhost

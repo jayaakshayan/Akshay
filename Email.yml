@@ -7,5 +7,6 @@
     to: Jayaakshayan@gmail.com
     subject: Ansible-report
     body: 'System {{ ansible_hostname }} has been successfully provisioned.'
+    secure: starttls
 
 

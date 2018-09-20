@@ -1,3 +1,6 @@
+- mail:
+    subject: 'System {{ ansible_hostname }} has been successfully provisioned.'
+  delegate_to: localhost
 - name: Mail
   hosts: localhost
   connection: local

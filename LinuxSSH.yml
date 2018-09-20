@@ -1,0 +1,63 @@
+- name: Create Azure VM
+  hosts: localhost
+  connection: local
+  tasks:
+  - name: Create resource group
+    azure_rm_resourcegroup:
+      name: testing
+      location: eastus
+  - name: Create virtual network
+    azure_rm_virtualnetwork:
+      resource_group: testing
+      name: myVnet
+      address_prefixes: "10.0.0.0/16"
+  - name: Add subnet
+    azure_rm_subnet:
+      resource_group: testing
+      name: mySubnet
+      address_prefix: "10.0.1.0/24"
+      virtual_network: myVnet
+  - name: Create public IP address
+    azure_rm_publicipaddress:
+      resource_group: testing
+      allocation_method: Static
+      name: myPublicIP
+    register: output_ip_address
+  - name: Dump public IP for VM which will be created
+    debug:
+      msg: "The public IP is {{ output_ip_address.state.ip_address }}."
+  - name: Create Network Security Group that allows SSH
+    azure_rm_securitygroup:
+      resource_group: testing
+      name: myNetworkSecurityGroup
+      rules:
+        - name: SSH
+          protocol: Tcp
+          destination_port_range: 22
+          access: Allow
+          priority: 1001
+          direction: Inbound
+  - name: Create virtual network inteface card
+    azure_rm_networkinterface:
+      resource_group: testing
+      name: myNIC
+      virtual_network: myVnet
+      subnet: mySubnet
+      public_ip_name: myPublicIP
+      security_group: myNetworkSecurityGroup
+  - name: Create VM
+    azure_rm_virtualmachine:
+      resource_group: testing
+      name: myVM
+      vm_size: Standard_DS1_v2
+      admin_username: azureuser
+      ssh_password_enabled: false
+      ssh_public_keys:
+        - path: /home/azureuser/.ssh/authorized_keys
+          key_data: ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEArNKhw931xVqvHI8FqminzhwnYiVxGwtp4er9yBSV04N/e6t5GPQAWKbn+9o0OlK013nUgx8XKG52u3KrQlpI6clmckSBHt4y8JgSWMWdNzWlu87hFEcix7Q3Ri5LxEP+GONRddMNKuFNXwzdg+7b6t/41AVTZWtnQE4cn+2dEQaKDAIJPOG5005MLHpyKpA4X+2I2DRUcUILpwz56HRcsGoMfZhcHY2JWgW6Qt0RC8TynXlnKfgK291qlna+LdiRgVbqFrCXORGfKRIN3KAu3CoKzfVoR/0G6uMVynL4x6jEY9L9fmJAs8tBJsOVpJDJets40sk8MfW7ngrfI/8sEw== rsa-key-20180822
+      network_interfaces: myNIC
+      image:
+        offer: CentOS
+        publisher: OpenLogic
+        sku: '7.5'
+        version: latest
